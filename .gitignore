@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Build
+dist/
+build/
+*.egg-info/
+.turbo/
+
+# Environment
+.env
+.env.local
+.env.*.local
+.env.production
+!.env.example
+!.env.production.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+.pytest_cache/
+htmlcov/
+
+# Data (stored in S3)
+data/sigml/
+data/stories/
+data/corpus/
+
+# ML
+ml/model_weights/
+services/translation/model_weights/
+services/recognition/model_weights/
+*.pt
+*.pth
+*.onnx
+wandb/
+mlruns/
+
+# Docker
+*.log
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+!*.tfvars.example

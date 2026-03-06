@@ -1,0 +1,980 @@
+SIGNFORGE
+AI-Powered Indian Sign Language Communication & Developer Platform
+PRODUCT REQUIREMENTS DOCUMENT
+Version 1.0  |  March 2026
+Status: FINAL  |  Classification: Internal
+Based on IKS Research Proposal 2026 — NSUT
+Automated Indian Sign Language Generation Framework for Jataka Tales
+Document Information
+Field
+Value
+Project Name
+SignForge
+Document Type
+Product Requirements Document (PRD)
+Version
+1.0
+Status
+Final
+Date
+March 2026
+Platform Type
+Full-Stack AI Web Application
+Primary Users
+Deaf/HoH Community, Developers, Educators, General Public
+Tech Stack
+React.js, Flask, PyTorch, Three.js / CWASA, PostgreSQL, Docker, Kubernetes
+Research Foundation
+IKS 2026 Proposal — NSUT (Dr. Shobha Bhatt et al.)
+Table of Contents
+1. Executive Summary
+2. Problem Statement
+3. Vision, Mission & Goals
+4. Target Users & Personas
+5. Market Context & Competitive Analysis
+6. Product Scope
+7. Feature Specifications — Module 1: ISL Communication Hub
+8. Feature Specifications — Module 2: Developer Dashboard & SDK
+9. Feature Specifications — Module 3: Educational Platform
+10. Feature Specifications — Module 4: Live Collaboration Canvas
+11. Feature Specifications — Module 5: Accessibility Auditor
+12. Feature Specifications — Module 6: Admin & Analytics
+13. Technical Architecture
+14. AI & ML Components
+15. Data Requirements & Dataset Strategy
+16. API Design
+17. Security & Compliance
+18. User Experience & Design Principles
+19. Implementation Roadmap
+20. Success Metrics & KPIs
+21. Risk Assessment & Mitigation
+22. Appendix
+1. Executive Summary
+SignForge is a comprehensive AI-powered platform that bridges Indian Sign Language (ISL) with the rest of the world. It addresses one of India's most critical accessibility gaps: over 63 million deaf and hard-of-hearing individuals who lack digital tools that speak their language.
+The platform operates on three interlocking pillars:
+Communication Layer — Real-time bidirectional translation between ISL (via webcam gesture recognition) and spoken/written Hindi & English, powered by a MediaPipe + BiLSTM + 3D Avatar pipeline.
+Developer Platform — An SDK and dashboard that lets developers embed ISL capabilities into any web or mobile application without deep ML expertise.
+Cultural & Educational Hub — An interactive library of 547 Jataka Tales translated into animated ISL, preserving ancient Indian knowledge in an indigenous communication system.
+Why SignForge Wins
+✦  First platform combining ISL translation + developer tooling + cultural preservation
+✦  Built on published academic research (NSUT IKS 2026) with a proven BiLSTM architecture
+✦  Addresses NEP 2020 inclusive education mandate and Rights of Persons with Disabilities Act 2016
+✦  Scalable: Docker + Kubernetes for any institution or enterprise
+✦  63M+ addressable users in India alone; expandable to global ISL & other sign languages
+2. Problem Statement
+2.1 The Accessibility Crisis
+India is home to approximately 63 million deaf and hard-of-hearing individuals — one of the largest such populations globally. Despite constitutional provisions guaranteeing equal educational access, this community faces systemic exclusion rooted in three compounding failures:
+Failure Area
+Current Reality
+Impact
+Interpreter Shortage
+1 certified interpreter per 10,000 deaf persons (vs. 1:50 in developed nations)
+Students cannot meaningfully participate in classrooms
+Digital Tools Gap
+No AI-powered ISL translation exists for Indian cultural content like Jataka Tales
+Ancient knowledge inaccessible in native language
+Developer Ecosystem
+No SDK or tooling for developers to add ISL to apps
+Perpetuates exclusion across all digital products
+Technology Mismatch
+Existing tools focus on ASL/BSL; ISL has distinct SOV grammar, 5,000+ unique signs
+Foreign tools fail deaf Indian users
+Hardware Barrier
+Existing ISL systems require specialised hardware
+Cannot scale to 63M users across diverse settings
+2.2 Cultural Knowledge Gap
+India's Jataka Tales — a canonical collection of 547 Buddhist birth stories — represent one of the richest repositories of ancient Indian wisdom, ethics, and moral philosophy. These tales have been transmitted across generations but remain inaccessible to the deaf community in their natural language (ISL). No existing platform has digitised these tales as ISL animations.
+2.3 Developer Exclusion Loop
+The absence of developer tooling creates a compounding problem: even if a developer wants to make their app accessible to deaf users, there is no straightforward API or SDK to integrate ISL features. This means accessibility is an afterthought across the entire Indian digital ecosystem — from healthcare apps to e-government portals to educational platforms.
+3. Vision, Mission & Goals
+Vision Statement
+A world where Indian Sign Language is a first-class citizen of the digital ecosystem —
+where every app speaks ISL, every story is signed, and every deaf person has equal access
+to knowledge, culture, and opportunity.
+Mission Statement
+To provide developers, educators, and the deaf community with the AI tools they need to
+create, consume, and communicate in Indian Sign Language — preserving cultural heritage
+while powering the next generation of accessible applications.
+3.1 Strategic Goals
+Goal
+Description
+Success Metric
+Accessibility
+Give 63M deaf/HoH Indians real-time ISL translation for digital content
+100K active users in Year 1
+Developer Adoption
+Become the go-to ISL SDK for Indian developers
+1,000 integrations in Year 2
+Cultural Preservation
+Digitise all 547 Jataka Tales in animated ISL
+547 tales complete by Month 24
+Research Baseline
+Establish India's most comprehensive English-ISL parallel corpus
+50,000+ sentence pairs
+Policy Alignment
+Enable NEP 2020 inclusive education in 500+ institutions
+500 institutional deployments
+Ecosystem Growth
+Open-source core pipeline to accelerate ISL research
+1,000+ GitHub stars, 50 forks
+4. Target Users & Personas
+4.1 Primary Users
+Persona 1 — Aarav, Deaf Student (Age 14)
+Aarav — Deaf Student
+Background: Studies in a mainstream school in Delhi; uses ISL as primary language
+Pain Points: Cannot access Hindi/English educational content; depends on rare interpreters
+Goals: Understand Jataka Tales and school lessons in ISL; communicate with hearing peers
+SignForge Use: ISL story library, real-time classroom translation, vocabulary builder
+Persona 2 — Priya, App Developer (Age 27)
+Priya — Full-Stack Developer
+Background: Builds edtech SaaS products; wants to meet NEP 2020 accessibility requirements
+Pain Points: No ISL API exists; building from scratch would take 6+ months
+Goals: Add ISL support to her app in a week; audit existing UI for accessibility gaps
+SignForge Use: Developer dashboard, REST API / NPM SDK, accessibility auditor
+Persona 3 — Dr. Meera, Educator (Age 45)
+Dr. Meera — Special Education Teacher
+Background: Runs a deaf school in Karnataka; teaches 40 students across 6 grades
+Pain Points: No digital ISL curriculum material; must create everything manually
+Goals: Assign ISL story content as homework; track student comprehension
+SignForge Use: Educator portal, ISL Jataka library, student progress dashboard
+Persona 4 — Rohit, Hearing Person (Age 32)
+Rohit — Colleague of Deaf Co-Worker
+Background: Works at an IT firm; has a deaf colleague and wants to communicate directly
+Pain Points: Language barrier prevents natural workplace collaboration
+Goals: Learn basic ISL signs; use app as real-time interpreter in meetings
+SignForge Use: ISL learning module, webcam-to-text translation, meeting overlay
+4.2 Secondary Users
+ISL Researchers & Linguists — Need annotated corpus data and translation models for academic work
+Government & NGOs — Seeking scalable solutions for accessible public services (e-governance)
+Healthcare Providers — Need ISL-enabled patient communication for deaf patients
+Enterprises — HR departments building inclusive workplaces
+5. Market Context & Competitive Analysis
+5.1 Market Size
+Segment
+Size
+SignForge Opportunity
+Deaf/HoH India
+63 million individuals
+Direct end-user base
+Indian Edtech Market
+USD 7.5B by 2026
+Accessibility compliance feature
+Global AST Market
+USD 11B by 2030
+ISL-specific vertical
+Indian Developer Ecosystem
+5+ million developers
+SDK/API market
+Special Education Institutions
+1,200+ schools for deaf in India
+B2B institutional sales
+5.2 Competitive Landscape
+Competitor / Tool
+Strengths
+Weaknesses vs SignForge
+SignAll (USA)
+Hardware gloves, high accuracy
+ASL only; expensive hardware; no ISL; no Indian content
+Google Translate (Gesture)
+Wide reach, brand trust
+No ISL; no avatar; no developer SDK; no cultural content
+Railway ISL System (India)
+97.5% domain accuracy
+Single domain only; not generalisable; no developer API
+ProGAN/SAGAN ISL tools
+High-res image generation
+Images only — no video, no sentence-level, no avatar
+HamNoSys/SiGML Tools
+Standard notation format
+No ML; no sentence grammar; no real-time translation
+MediaPipe (Google)
+Excellent pose estimation
+Raw library only — no ISL translation layer or UI
+SignForge
+ISL-specific, full-stack, cultural + developer platform
+New entrant — brand awareness is key challenge
+6. Product Scope
+6.1 Platform Overview
+SignForge is structured as six deeply integrated modules, each serving a distinct user need while sharing a common AI backbone (the ISL Translation Engine) and data layer (the ISL Knowledge Graph).
+Module
+Primary Users
+Core Value
+Module 1: ISL Communication Hub
+Deaf, Hearing Users
+Real-time bidirectional ISL ↔ text/speech translation
+Module 2: Developer Dashboard & SDK
+Developers
+Embed ISL in any app via API/NPM in minutes
+Module 3: Educational Platform
+Students, Educators
+Jataka Tales library + ISL curriculum tools
+Module 4: Live Collaboration Canvas
+Teams with deaf members
+Multi-user workspace with ISL avatar narration
+Module 5: Accessibility Auditor
+Developers, Product Managers
+WCAG/ISL gap scanner with auto-fix suggestions
+Module 6: Admin & Analytics
+Admins, Researchers
+Usage analytics, model monitoring, corpus management
+6.2 In Scope
+Web application (desktop + mobile responsive) — No native app required for v1
+ISL avatar animation using CWASA WebGL engine with SiGML files
+BiLSTM + Transformer sequence-to-sequence translation model (English → ISL Glosses)
+MediaPipe-based webcam ISL gesture recognition (ISL → Text/Speech)
+848 pre-authored SiGML animation files + expansion to 2,000+ in v2
+Jataka Tales library (50 tales in v1, full 547 in v2)
+REST API + NPM/Python SDK for developers
+Feedback-driven continuous learning pipeline
+Docker + Kubernetes deployment infrastructure
+6.3 Out of Scope (v1)
+Native iOS / Android applications
+Hardware glove / wearable integration
+Support for sign languages other than ISL (ASL, BSL etc.) — planned for v3
+Offline mode (requires internet connection in v1)
+Video calling feature (planned v2)
+7. Feature Specs — Module 1: ISL Communication Hub
+The ISL Communication Hub is the consumer-facing heart of SignForge. It enables bidirectional, real-time communication between ISL users and the hearing world, without any specialised hardware.
+7.1 Text / Speech → ISL Translation
+Feature 1.1 — Text Input Panel
+User types any Hindi or English text into a rich text editor
+Automatic language detection (Hindi/English) with manual override option
+Support for paste, voice dictation (via OpenAI Whisper ASR), and file upload (.txt, .docx)
+Character count, word count, and estimated signing duration displayed in real time
+Emoji and special character support mapped to relevant ISL expressions
+Feature 1.2 — Translation Pipeline
+Hindi text → LLM/Pre-Trained Model → English (Step 1: Cross-lingual bridge)
+English → NLP Preprocessing (tokenisation, lemmatisation, stopword removal, normalisation)
+Preprocessed text → BiLSTM Encoder with Attention Mechanism → ISL Glosses
+ISL Glosses → ISL Mapper → SiGML file lookup (848 files in v1; 2,000+ in v2)
+Unmapped vocabulary → Automatic character-by-character fingerspelling fallback
+Translation confidence score displayed to user (low confidence triggers review flag)
+Feature 1.3 — 3D Avatar ISL Renderer
+CWASA WebGL avatar renders smooth, continuous ISL animations in the browser
+Avatar gender selection (male/female/neutral avatar options)
+Adjustable signing speed (0.5x to 2.0x playback)
+Looping mode for repeated practice
+Pause, rewind, and step-by-step gloss navigation controls
+Synchronised text highlighting — words highlight in the source text as avatar signs them
+Full-screen mode and picture-in-picture (PiP) support
+Dark mode / high contrast mode for visual accessibility
+7.2 ISL → Text / Speech Translation (Webcam Mode)
+Feature 1.4 — Real-Time Gesture Capture
+Webcam activation with one click; no app install required
+MediaPipe Holistic captures 33 body landmarks + 21 hand landmarks per frame at 30fps
+Real-time skeleton overlay on webcam feed showing captured pose
+Confidence threshold indicator for each detected sign
+Privacy-first: all processing is client-side (no video sent to server)
+Feature 1.5 — Sign Recognition & Output
+Recognised ISL signs converted to English gloss sequence
+Gloss sequence → NLP post-processing → natural English sentence output
+Text-to-Speech output using browser's Web Speech API (male/female voice options)
+Hindi translation option for the recognised text
+Conversation history panel showing both sides of a dialogue
+Export conversation as PDF or share via link
+7.3 Conversation Mode (Deaf ↔ Hearing)
+Feature 1.6 — Split-Screen Dialogue Interface
+Left panel: Hearing person types/speaks → signs appear in avatar for deaf user
+Right panel: Deaf person signs via webcam → text/speech output for hearing user
+Real-time synchronisation with <500ms latency target
+Conversation transcript saved with timestamps
+Shareable conversation session link for remote conversations
+Mobile-responsive layout for use on phones in face-to-face situations
+7.4 ISL Dictionary & Vocabulary Builder
+Feature 1.7 — Searchable ISL Dictionary
+Browse 5,000+ ISL signs with avatar demonstration
+Search by English word, Hindi word, or handshape description
+Each entry shows: sign video, gloss notation, HamNoSys code, usage examples
+'Word of the Day' feature for passive vocabulary building
+Bookmark and organise words into custom vocabulary lists
+Feature 1.8 — Vocabulary Learning Mode
+Flashcard system: see word → attempt sign → compare with avatar
+Spaced repetition algorithm (SM-2) for optimal retention
+Progress tracking: words learned, accuracy rate, streak
+Category-based learning packs (greetings, numbers, colours, emotions, professions, etc.)
+8. Feature Specs — Module 2: Developer Dashboard & SDK
+This module transforms SignForge's ISL AI into developer infrastructure. Any developer can add ISL capabilities to their app with a few lines of code.
+8.1 Developer Onboarding
+OAuth 2.0 sign-up with Google/GitHub
+API key generation and management (rotate, revoke, scope-limited keys)
+Sandbox environment with 1,000 free API calls per month
+Interactive 'Hello ISL' tutorial completing first integration in <10 minutes
+SDKs available for: JavaScript/TypeScript (NPM), Python (PyPI), REST (language-agnostic)
+8.2 Code-to-ISL Pipeline
+Feature 2.1 — UI String Extractor
+Paste React, Vue, Angular, or plain HTML/JSX code into the dashboard
+AI parser automatically identifies all user-facing text strings and ARIA labels
+One-click ISL translation of extracted strings using the SignForge translation engine
+Preview each translated string as an avatar animation
+Export as: SiGML files, JSON sign map, or React ISL component bundle
+Feature 2.2 — Prompt-to-Prototype (LLM-Powered)
+Natural language spec input: 'Build a healthcare booking form for deaf patients'
+LLM (Llama 3 / Grok API) generates complete React component with embedded ISL support
+Generated code includes: ISL avatar for each label/message, WCAG 2.2 compliance, keyboard nav
+Deploy to Vercel/Netlify with one click from the dashboard
+GitHub Copilot-style inline ISL suggestion as developer types (browser extension v2)
+8.3 SignForge API
+Feature 2.3 — Translation REST API
+POST /v1/translate
+Parameter
+Type
+Description
+text
+string
+Input text (Hindi or English, max 2,000 chars)
+source_lang
+string
+Source language: 'hi' | 'en' (auto-detect if omitted)
+output_format
+string
+'sigml' | 'gloss' | 'json' | 'mp4_url'
+avatar_style
+string
+'default' | 'male' | 'female' | 'neutral'
+speed
+float
+Signing speed multiplier: 0.5 to 2.0 (default: 1.0)
+webhook_url
+string
+Optional callback URL for async video generation
+Feature 2.4 — Gesture Recognition WebSocket API
+ws://api.signforge.in/v1/recognize — streams pose landmark data from client webcam
+Server-side LSTM inference returns recognised gloss and confidence score every 100ms
+Supports batch mode: upload video file, receive full transcript
+Language output options: English, Hindi, both
+8.4 NPM & Python SDK
+Feature 2.5 — JavaScript / TypeScript SDK
+npm install @signforge/sdk — zero native dependencies
+ISLAvatar React component: drop-in 3D avatar with props for text, speed, and style
+useISLTranslation hook for functional components
+ISLInput component: text field with integrated avatar preview
+Storybook documentation with live component demos
+Feature 2.6 — Python SDK
+pip install signforge — compatible with Python 3.9+
+Synchronous and async (asyncio) translation functions
+Flask/Django middleware for automatic ISL header generation
+LangChain integration for ISL-enabled LLM chains
+8.5 Performance Monitoring Dashboard
+Real-time API latency monitoring (p50, p95, p99 percentiles)
+Translation quality metrics (BLEU score trend, error rate by category)
+Usage analytics: requests/day, unique users, top translated content
+Model comparison view: BiLSTM vs. Stanford Parser fallback usage rate
+Webhook delivery status and retry queue management
+9. Feature Specs — Module 3: Educational Platform
+Rooted in the IKS research proposal, this module digitises India's Jataka Tales as animated ISL content and provides a complete curriculum delivery system for deaf education.
+9.1 Jataka Tales ISL Library
+Feature 3.1 — Story Browser
+Searchable library of Jataka Tales (50 tales in v1, all 547 by v2)
+Filter by theme: Animal Tales | Human-Centered | Wisdom & Cleverness | Sacrifice & Renunciation | Karmic Justice
+Filter by difficulty: Beginner | Intermediate | Advanced (based on vocabulary complexity)
+Filter by length: Short (<5 min) | Medium (5–15 min) | Long (>15 min)
+Thumbnail cards showing story title in English, Hindi, and ISL gloss
+Feature 3.2 — Immersive Story Player
+Full-screen 3D avatar storytelling experience
+Side-by-side view: avatar signing + synchronised Hindi/English text (word-by-word highlighting)
+Chapter navigation within long tales
+Vocabulary spotlight mode: tap any word to see its ISL sign and definition
+Bookmarking and note-taking within stories
+Completion tracking and reading history
+Social sharing: share favourite tale moments with deep-link to exact timestamp
+9.2 Educator Portal
+Feature 3.3 — Classroom Management
+Teacher dashboard to create classes, add students, assign content
+Assignment builder: select tales or vocabulary sets, set due dates
+Student progress tracking: completion rate, time spent, quiz scores
+Printable progress reports for IEP documentation
+Parent portal view with simplified progress summary
+Feature 3.4 — Interactive Quiz Engine
+Auto-generated comprehension quizzes from story content
+Question types: watch sign → identify word, read sentence → see correct sign, story sequence ordering
+Adaptive difficulty: harder questions for students who answer consistently correctly
+Instant feedback with correct sign demonstration
+Leaderboard (optional, teacher-configurable) for classroom motivation
+9.3 ISL Curriculum Builder
+Feature 3.5 — Lesson Plan Creator
+Teachers create structured lesson plans combining tale segments + vocabulary + quizzes
+Curriculum templates aligned with CBSE and State Board special education syllabi
+Sharable lesson plans across the educator community
+Export lesson plans as PDF or SCORM package (LMS-compatible)
+Feature 3.6 — Student ISL Practice Studio
+Students record themselves signing using webcam
+AI analysis compares student signing to reference avatar (pose similarity score)
+Detailed feedback: handshape accuracy, movement path, facial expression usage
+Practice history with improvement trend graphs
+10. Feature Specs — Module 4: Live Collaboration Canvas
+The Collaboration Canvas makes remote and in-person teamwork inclusive by default — ISL users participate fully in collaborative work without needing a human interpreter.
+10.1 Real-Time Collaborative Workspace
+Feature 4.1 — Multi-User Document Editor
+Rich-text collaborative document editor (similar to Google Docs)
+All edits narrated in ISL via avatar in real time for deaf collaborators
+'ISL Read Aloud' button: avatar reads entire document in ISL on demand
+Comment threads visible in both text and ISL avatar format
+Version history with ISL narration of changes between versions
+Feature 4.2 — ISL Meeting Overlay
+Browser extension that adds an ISL avatar overlay to any video call (Zoom, Meet, Teams)
+Speaker's words transcribed by Whisper ASR → translated → signed by avatar in real time
+Deaf participant signs via webcam → text captions generated for hearing participants
+Meeting transcript exported with both text and ISL gloss notation
+10.2 Collaborative Design Board
+Feature 4.3 — Visual Whiteboard with ISL Integration
+Infinite canvas for diagrams, sketches, and sticky notes (Figma/Miro-inspired)
+Voice/text annotations on canvas elements automatically signed by avatar
+Gesture drawing mode: deaf users sign 'shapes' that are recognised and rendered as shapes
+ISL instruction recording: creator records ISL walkthrough attached to each element
+Export as accessible PDF with embedded ISL video QR codes for each annotation
+10.3 Async Communication
+Feature 4.4 — ISL Video Message System
+Record a short ISL video message (webcam); system auto-generates text transcript
+Recipients can reply in text; reply auto-translated to ISL avatar video
+ISL inbox / outbox with search across transcripts
+Channels (similar to Slack) with ISL-first threading
+11. Feature Specs — Module 5: Accessibility Auditor
+The Accessibility Auditor helps developers and product teams find and fix ISL and WCAG 2.2 accessibility gaps in their applications — automatically.
+11.1 Automated Code Audit
+Feature 5.1 — Repository Scanner
+Connect GitHub / GitLab repository via OAuth; scanner runs on each PR
+Identifies all user-facing text strings lacking ISL annotation
+Checks for missing ARIA labels, alt text, keyboard navigation, screen reader compatibility
+Detects ISL-specific issues: no sign language alternative for audio content, no avatar option for text-heavy UI
+Generates a prioritised issue list (Critical / High / Medium / Low) with line-number references
+Feature 5.2 — Accessibility Score
+Single score (0–100) summarising ISL and WCAG compliance
+Breakdown by category: ISL Coverage, WCAG 2.2, Cognitive Load, Visual Contrast
+Historical score trend to track improvement over time
+Benchmark against similar apps in the SignForge developer network
+11.2 Auto-Fix & Suggestions
+Feature 5.3 — AI-Powered Auto-Fix
+One-click fix: inserts ISLAvatar component around flagged text elements
+Suggests ARIA label values and alt text using AI description of element context
+Generates pull request with all fixes applied (GitHub integration)
+Confidence indicator on each auto-fix; low-confidence fixes flagged for human review
+Feature 5.4 — Compliance Report Generator
+Generates legally-formatted accessibility compliance report (PDF)
+Aligned with: WCAG 2.2, Rights of Persons with Disabilities Act 2016, NEP 2020 guidelines
+Can be submitted to government auditors as proof of accessibility compliance
+Certificate of compliance issued for apps scoring 80+
+12. Feature Specs — Module 6: Admin & Analytics
+12.1 Platform Administration
+Role-based access control: Super Admin, Institution Admin, Educator, Student, Developer, API User
+User management: invite, suspend, reset password, export user data (DPDP Act 2023 compliant)
+Content moderation queue for user-submitted ISL corrections and annotations
+SiGML file management: upload, preview, tag, and retire animation files
+System health dashboard: API latency, model inference time, error rate
+12.2 Research & Training Data Dashboard
+Corpus management: view, filter, export English-ISL sentence pairs
+Annotation queue: review ISL expert corrections from the feedback pipeline
+Inter-annotator agreement metrics (Cohen's Kappa) displayed per annotation batch
+Model training trigger: initiate retraining with new annotations; compare BLEU scores before/after
+Dataset version control with full audit log
+12.3 Analytics & Reporting
+Real-time usage dashboard: DAU/MAU, session duration, feature usage heatmap
+Translation quality metrics: BLEU score trend, error type distribution (lexical/grammatical/contextual/technical)
+User satisfaction: NPS surveys triggered after 10 sessions
+Educational outcomes: quiz completion rates, vocabulary retention rates
+API partner analytics: top integrations, most-translated content categories
+13. Technical Architecture
+13.1 System Overview
+SignForge is built as a microservices architecture deployed on Kubernetes, with a React.js frontend, Flask-based API gateway, and dedicated ML inference service. All components communicate via REST and WebSocket.
+Architecture Layers
+Layer
+Technology
+Responsibility
+Frontend
+React.js + TypeScript + Tailwind CSS
+User interface, WebGL avatar, webcam capture
+API Gateway
+Flask (Python) + Nginx reverse proxy
+Request routing, auth, rate limiting
+Translation Service
+PyTorch + FastAPI
+BiLSTM inference, NLP preprocessing
+ASR Service
+OpenAI Whisper + CUDA (optional)
+Speech-to-text for audio input
+NLP Service
+Stanford CoreNLP + spaCy
+Tokenisation, lemmatisation, POS tagging
+ISL Mapper
+Python + JSON lookup (sigmlFiles.json)
+Gloss → SiGML file resolution
+Avatar Renderer
+CWASA WebGL engine (Three.js wrapper)
+SiGML → 3D animation in browser
+Gesture Recognition
+MediaPipe Holistic + PyTorch LSTM
+Webcam → ISL sign classification
+Database
+PostgreSQL (primary) + SQLite (fallback)
+Users, content, annotations, API keys
+Cache
+Redis
+Translation cache, session store, rate limit counters
+Message Queue
+Celery + Redis
+Async video generation, model retraining jobs
+Storage
+AWS S3 / Azure Blob
+SiGML files, generated MP4 avatars, annotated corpus
+CDN
+CloudFront / Azure CDN
+Static assets and avatar video streaming
+ML Tracking
+MLflow
+Model versioning, experiment tracking, BLEU score history
+Monitoring
+Prometheus + Grafana
+System metrics, API performance, error alerting
+CI/CD
+GitHub Actions + Docker + Kubernetes
+Automated testing and deployment
+13.2 Deployment Architecture
+Kubernetes cluster on AWS EKS or Azure AKS (cloud-agnostic)
+Horizontal Pod Autoscaler: scales translation pods from 2 to 20 replicas based on queue depth
+GPU node pool (NVIDIA T4/A10) for ML inference; auto-scaled to zero when idle
+Multi-region deployment (Mumbai primary, Singapore failover) for Indian user latency targets
+Content Delivery Network for SiGML files and avatar videos (sub-100ms load time globally)
+Database: Amazon RDS PostgreSQL with read replicas; automated daily backups with 30-day retention
+13.3 Hardware Specifications (Development & Production)
+Component
+Specification
+Development Workstation
+Intel i7/AMD Ryzen 7 (8+ cores), NVIDIA RTX 4060 (12GB VRAM), 32GB DDR4, 1TB NVMe
+Training Infrastructure
+Kaggle Cloud (Tesla P100/T4) + local GPU workstation
+Production GPU Nodes
+NVIDIA T4 (16GB) × 4 (inference cluster)
+Production CPU Nodes
+32 vCPU, 128GB RAM per node × 3 nodes (API + web tier)
+Storage
+1TB NVMe SSD per node + 10TB S3 for media
+Network
+1Gbps minimum; CDN for static assets
+14. AI & ML Components
+14.1 ISL Translation Model (Text → Gloss)
+Architecture
+Base: 2-layer Bidirectional LSTM encoder (512 hidden units, 256-dim word embeddings)
+Enhancement: Transformer multi-head attention (8 heads) for global sequence alignment
+Temporal convolution layers to capture sign timing and movement flow
+Decoder: LSTM with teacher forcing during training; autoregressive inference
+Fallback: Stanford CoreNLP rule-based parser (SOV grammar mapping) when model confidence < threshold
+Training Configuration
+Parameter
+Value
+Loss Function
+Cross-entropy with label smoothing (smoothing factor: 0.1)
+Optimizer
+Adam (lr: 0.001, β1: 0.9, β2: 0.999)
+Gradient Clipping
+max_norm = 5.0
+LR Scheduler
+ReduceLROnPlateau (patience: 3, factor: 0.5)
+Early Stopping
+Validation BLEU score; patience = 5 epochs
+Data Split
+80% train / 10% validation / 10% test
+Regularisation
+Dropout (0.3), Label smoothing, Bayesian hyperparameter tuning (Optuna)
+Checkpointing
+Every 5 epochs; best model saved on validation BLEU
+Target BLEU Score
+≥ 0.75 on held-out test set
+Batch Size
+64 (adjustable based on GPU memory)
+Max Epochs
+100 with early stopping
+14.2 ISL Recognition Model (Gesture → Text)
+Input: MediaPipe Holistic landmarks (33 pose + 21 left hand + 21 right hand = 75 keypoints × 3D)
+Model: 3-layer BiLSTM (256 hidden units) for temporal sequence classification
+Window: 30-frame sliding window (1 second at 30fps) for each sign boundary detection
+Post-processing: Beam search (width 5) to select most probable gloss sequence
+Language model rescoring: 3-gram ISL language model to improve sequence coherence
+Target accuracy: 90%+ on isolated signs; 80%+ on continuous sentence-level recognition
+14.3 LLM Integration (Prompt-to-Prototype)
+Primary: Llama 3.1 (8B) self-hosted on GPU cluster for code generation and UI suggestions
+Fallback: Grok API / OpenAI API for complex multi-step generation tasks
+Fine-tuned with ISL-specific coding patterns from the SignForge component library
+Function calling: structured output guarantees valid React component generation
+14.4 Continuous Learning Pipeline
+User corrections and expert annotations collected via in-app feedback tool
+Annotation review queue processed by ISL expert team (target: 24-hour turnaround)
+Automated retraining triggered when new annotation batch exceeds 500 pairs
+A/B testing: new model serves 10% of traffic; promoted if BLEU improves by >0.02
+MLflow tracks all experiments; full rollback capability to any previous model version
+15. Data Requirements & Dataset Strategy
+15.1 Primary Datasets
+Dataset
+Source / Description
+Volume (v1)
+Jataka Tales Corpus
+Hindi translations of Jātakatthavaṇṇanā (547 Pali Buddhist birth stories)
+50 tales (~75K words)
+SiGML Sign Library
+Pre-authored SiGML animation files (HamNoSys encoded)
+848 files (target: 2,000 in v2)
+English-ISL Parallel Pairs
+Annotated by ISLRTC-certified experts using ELAN tool
+10,000 pairs (target: 50,000)
+ISL Video Corpus
+Multi-modal: video + gloss + 3D pose coordinates (ELAN .eaf format)
+100 hours (target: 500 hours)
+INCLUDE Dataset
+Existing ISL recognition benchmark (baseline training)
+4,292 video samples
+ISL-CSLTR Corpus
+Continuous Sign Language Translation Reference corpus
+As available
+mBERT Embeddings
+Multilingual BERT (HuggingFace) for cross-lingual transfer
+Pre-trained weights
+15.2 Annotation Framework
+Tool: ELAN (ELAN Linguistic Annotator) with custom ISL tier templates
+Annotation tiers: gloss (dominant hand), gloss (non-dominant hand), facial expressions, mouthing, eye gaze, non-manual markers
+Annotators: ISLRTC-certified ISL experts + native deaf community signers
+Quality control: inter-annotator agreement (Cohen's Kappa > 0.80 required for inclusion)
+Weekly review meetings with annotation team; 24-hour correction turnaround
+Storage format: ELAN (.eaf) + JSON for ML consumption; Git + SQLite version control
+15.3 Data Governance & Privacy
+All user webcam data processed client-side; raw video never sent to server
+Processed landmarks (not video) used for recognition; users explicitly opt-in
+Feedback corrections anonymised before entering training pipeline
+Data retention policy: 90 days for session data; permanent for consented annotations
+DPDP Act 2023 (India Digital Personal Data Protection) compliance built-in from day one
+GDPR-compatible design for international user base
+16. API Design
+16.1 Core API Endpoints
+Endpoint
+Method
+Description
+POST /v1/translate
+POST
+Text → ISL glosses + SiGML path; supports Hindi & English input
+POST /v1/translate/batch
+POST
+Batch translation (up to 100 texts per request)
+GET  /v1/signs/{word}
+GET
+Lookup SiGML animation file for a specific English/Hindi word
+GET  /v1/signs/search
+GET
+Search dictionary by keyword, category, or handshape
+POST /v1/recognize
+WS
+WebSocket stream: landmark data in → gloss sequence out
+POST /v1/recognize/video
+POST
+Upload video file → full ISL transcript
+GET  /v1/stories
+GET
+List Jataka Tales with filters (theme, length, difficulty)
+GET  /v1/stories/{id}
+GET
+Full story content with ISL gloss annotations
+POST /v1/audit
+POST
+Submit HTML/JSX code for accessibility audit
+GET  /v1/audit/{job_id}
+GET
+Retrieve audit results for an async audit job
+POST /v1/feedback
+POST
+Submit translation correction for training pipeline
+GET  /v1/usage
+GET
+API usage statistics for authenticated developer
+16.2 Authentication & Rate Limits
+Tier
+Rate Limit
+Free (Sandbox)
+1,000 requests/month; 1 req/sec; no commercial use
+Starter ($29/month)
+50,000 requests/month; 10 req/sec; commercial OK
+Growth ($99/month)
+500,000 requests/month; 50 req/sec; webhook support
+Enterprise (Custom)
+Unlimited; dedicated GPU; SLA 99.9%; on-premise option
+16.3 Webhooks
+Register webhook URL via developer dashboard
+Events: translation.complete, recognition.complete, audit.complete, model.updated
+Webhook payload signed with HMAC-SHA256 using API secret key for verification
+Automatic retry with exponential backoff (3 attempts) on delivery failure
+17. Security & Compliance
+17.1 Security Measures
+TLS 1.3 encryption for all data in transit; AES-256 for data at rest
+OAuth 2.0 with PKCE for user authentication; JWT access tokens (15-min expiry)
+API key hashing: keys stored as bcrypt hash; never logged or displayed after creation
+Rate limiting at API gateway level (per IP and per API key)
+OWASP Top 10 audit performed before each major release
+Penetration testing by third-party firm annually
+SQL injection prevention via parameterised queries (no raw SQL)
+Content Security Policy headers; XSS protection; CSRF tokens on all state-changing forms
+17.2 Compliance Framework
+Regulation / Standard
+Compliance Approach
+DPDP Act 2023 (India)
+Data minimisation, explicit consent, right to erasure, DPO appointment
+WCAG 2.2 Level AA
+Platform itself meets WCAG 2.2 — auditor checks this in other apps
+Rights of Persons with Disabilities Act 2016
+ISL translation as accessibility mechanism aligns with Section 42
+NEP 2020
+Platform directly supports inclusive education mandate
+ISO 27001 (target Y2)
+Information security management system for enterprise tier
+GDPR (international users)
+GDPR-compatible privacy controls; EU hosting option for European partners
+18. User Experience & Design Principles
+18.1 Core Design Principles
+Principle
+What It Means
+How We Implement It
+ISL-First
+ISL is not an afterthought — it is the primary interface
+Avatar visible on every content page; default-on, not opt-in
+Zero Hardware
+No gloves, sensors, or special devices required
+Webcam only (standard laptop/phone camera)
+Instant Feedback
+Users see results in real time, not after a wait
+<500ms translation latency target; streaming avatar render
+Cultural Respect
+Honour ISL as a complete language, not a workaround
+SOV grammar preserved; no English word-for-word signing
+Inclusive Accessibility
+The accessibility platform must itself be accessible
+WCAG 2.2 AA compliance; keyboard nav; screen reader support
+Progressive Disclosure
+Simple surface, powerful depth
+Clean homepage; advanced features revealed as needed
+18.2 Key UX Requirements
+Onboarding: new user completes first ISL translation within 60 seconds of sign-up
+Mobile-responsive: all core features work on a 375px wide screen (iPhone SE breakpoint)
+Dark mode: system-preference detection + manual toggle; dark mode preferred by many deaf users
+Font size controls: minimum 16px body text; user-adjustable via accessibility panel
+Colour contrast: minimum 4.5:1 ratio for all text (WCAG 2.2 AA)
+Loading states: skeleton screens for all async operations; never blank white screens
+Error states: all errors shown in plain language + ISL avatar explanation of the error
+19. Implementation Roadmap
+19.1 Overview
+Phase
+Timeline
+Focus
+Phase 1: Foundation
+Months 1–8
+Dataset creation, core translation pipeline, ISL avatar MVP
+Phase 2: Core Product
+Months 9–18
+Full model training, all 6 modules built, developer SDK
+Phase 3: Validation
+Months 19–22
+Human evaluation, performance tuning, institutional pilots
+Phase 4: Launch
+Months 23–24
+Public launch, enterprise sales, open-source release
+19.2 Phase 1 — Foundation (Months 1–8)
+Month 1–2: Data & Infrastructure
+Select 50 Jataka Tales from 547-tale collection; extract Hindi text as JSON
+Set up cloud infrastructure (AWS EKS + RDS + S3); configure CI/CD pipeline
+Establish ISLRTC partnership; recruit 5 certified ISL expert annotators
+Set up ELAN annotation environment; develop annotation guidelines
+Month 3–5: Annotation & Baseline Model
+Multi-modal data collection: video + gloss + 3D pose for 50 tales
+Build English-ISL parallel corpus (target: 5,000 pairs in Phase 1)
+Implement baseline BiLSTM Seq2Seq model; establish BLEU baseline on INCLUDE dataset
+Deploy 848 existing SiGML files to production storage
+Month 6–8: ISL Communication Hub MVP
+Build React.js frontend: text input panel, avatar renderer, translation pipeline
+Integrate CWASA WebGL avatar with SiGML → HamNoSys → animation pipeline
+Implement MediaPipe webcam capture + basic gesture recognition (isolated signs)
+Internal alpha testing with 10 deaf community members; collect feedback
+19.3 Phase 2 — Core Product (Months 9–18)
+Month 9–12: Model Enhancement & Developer Platform
+Add transformer multi-head attention to BiLSTM model; retrain with full corpus
+Build Developer Dashboard v1: API key management, documentation, playground
+Release NPM SDK (JavaScript) and Python SDK; publish on PyPI
+Build Code-to-ISL pipeline; Prompt-to-Prototype feature (LLM integration)
+Month 13–15: Educational Platform
+Build Jataka Tales story player with synchronised text highlighting
+Educator portal: class management, assignment builder, progress tracking
+Quiz engine with 3 question types; adaptive difficulty algorithm
+Pilot with 3 deaf schools (50 students total)
+Month 16–18: Collaboration & Auditor
+Build Live Collaboration Canvas: document editor + ISL narration
+ISL Meeting Overlay browser extension (Chrome + Firefox)
+Accessibility Auditor: GitHub integration, auto-fix, compliance report
+Beta launch with 50 developers; SDK stress testing
+19.4 Phase 3 — Validation (Months 19–22)
+Run BLEU, ROUGE, and Cohen's Kappa on full held-out test set
+Human evaluation: ISL experts score 200 translations on 5-point scale (grammar, accuracy, fluency, cultural fit, comprehensibility)
+Deaf community focus groups (6 sessions, 10 participants each) for qualitative feedback
+Error analysis: categorise all failures into lexical, grammatical, contextual, technical
+Performance optimisation: reduce p95 latency to <500ms; GPU utilisation tuning
+Expand sign library from 848 to 1,500 SiGML files based on gap analysis
+19.5 Phase 4 — Launch (Months 23–24)
+Public beta launch with Product Hunt campaign
+Enterprise tier launch: pitch to 10 edtech companies and 5 government agencies
+Open-source core translation pipeline on GitHub (MIT licence)
+Academic paper submission to NeurIPS or ACL (ISL translation research)
+Press kit and media outreach; partnership with ISLRTC for official endorsement
+Roadmap planning for v2: native apps, ASL/BSL support, video calling, offline mode
+20. Success Metrics & KPIs
+20.1 Technical Metrics
+Metric
+Target
+Translation Model BLEU Score
+≥ 0.75 on held-out test set (ISL gloss accuracy)
+Gesture Recognition Accuracy
+≥ 90% (isolated signs); ≥ 80% (continuous sentences)
+API Response Latency (p95)
+< 500ms for translation; < 200ms for dictionary lookup
+System Uptime
+≥ 99.9% (measured monthly)
+Avatar Animation Load Time
+< 2 seconds for first sign; < 100ms per subsequent sign
+Concurrent Users
+500 concurrent without degradation (v1); 5,000 (v2)
+SiGML Coverage
+848 signs (v1); 2,000 signs (v2); 5,000 signs (v3)
+20.2 Product Metrics
+Metric
+Target (12 months post-launch)
+Monthly Active Users
+10,000 (v1 launch); 100,000 (end of Year 1)
+Jataka Tales Completed
+50 (v1); 547 (v2, by Month 24)
+Developer API Integrations
+100 (Month 12); 1,000 (Month 24)
+Institutional Deployments
+50 schools/universities in Year 1
+English-ISL Parallel Pairs
+10,000 (Phase 1); 50,000 (Phase 4)
+Annotation Quality (Cohen's Kappa)
+≥ 0.80 across all annotation batches
+User Satisfaction (NPS)
+≥ 50 (industry average for SaaS is 31)
+21. Risk Assessment & Mitigation
+Risk
+Probability / Impact
+Mitigation Strategy
+Model BLEU below target (< 0.75)
+Medium / High
+Stanford Parser fallback system; expand training corpus; Bayesian hyperparameter tuning via Optuna
+ISLRTC partnership delays
+Medium / High
+Begin annotation with freelance ISL experts from deaf community; ISLRTC brings quality enhancement, not hard dependency
+SiGML coverage gap (unmapped words)
+High / Medium
+Automatic character-by-character ISL fingerspelling for all unmapped vocabulary; continuous library expansion
+WebGL avatar performance on low-end devices
+Medium / Medium
+2D fallback avatar; pre-rendered MP4 option for slow connections; progressive enhancement
+Developer SDK adoption slow
+Medium / High
+Free tier with generous limits; interactive playground; 'Hello ISL in 10 min' tutorial; open-source core
+Data privacy concerns (webcam)
+Low / High
+Client-side processing; no video sent to server; explicit opt-in; privacy audit before launch
+Academic IP concerns from NSUT
+Low / High
+Separate commercial entity; clear IP licensing agreement; NSUT collaboration credited and compensated
+Competitor enters ISL space
+Low / High
+Build moat: 547 Jataka Tales corpus is unique; ISL-specific grammar handling; community network effects
+Scalability under load (GPU)
+Medium / Medium
+Kubernetes HPA; GPU auto-scaling; Redis caching for repeated translations; CDN for static SiGML
+Cultural inaccuracy in ISL translations
+Medium / High
+Deaf community review board; continuous feedback pipeline; ISL expert sign-off on Jataka Tales content
+22. Appendix
+22.1 Glossary
+Term
+Definition
+ISL
+Indian Sign Language — the natural visual-gestural language of India's deaf community, with Subject-Object-Verb grammar distinct from English or Hindi
+SiGML
+Signing Gesture Markup Language — XML-based format encoding how a sign should be performed (hand shape, movement, location, orientation)
+HamNoSys
+Hamburg Notation System — phonetic alphabet for describing hand movements and configurations in sign language
+CWASA
+Sign language WebGL avatar rendering engine used by SignForge
+ISL Gloss
+Written representation of an ISL sign, typically an English word in ALL CAPS (e.g., KING, GIVE, TOMORROW)
+BiLSTM
+Bidirectional Long Short-Term Memory — neural network architecture that processes sequences both forward and backward
+BLEU Score
+Bilingual Evaluation Understudy — standard metric for machine translation quality (0 to 1; higher is better)
+SOV
+Subject-Object-Verb — the word order used in ISL (e.g., 'I ball throw' not 'I throw ball')
+ISLRTC
+Indian Sign Language Research and Training Centre, New Delhi — government body for ISL standardisation
+NEP 2020
+National Education Policy 2020 — India's education framework mandating inclusive education for students with disabilities
+ELAN
+ELAN Linguistic Annotator — tool for multi-tier annotation of video/audio ISL data
+MediaPipe
+Google's open-source framework for real-time body, hand, and face landmark detection
+DPDP Act
+Digital Personal Data Protection Act 2023 — India's data privacy law
+22.2 Research Foundation
+SignForge is built on published academic research from the Indian Knowledge System (IKS) 2026 Research Proposal submitted to the Government of India by Dr. Shobha Bhatt (PI) and Dr. Prakash Rao Ragiri (Co-PI) at Netaji Subhas University of Technology (NSUT), with collaboration from Prof. Manju Khari (JNU Linguistic Empowerment Cell). The proposal presents a technically validated pipeline for automated ISL generation from Jataka Tales using BiLSTM, SiGML, and the CWASA avatar engine.
+22.3 Key References
+Sharma et al. (2021). Benchmarking deep neural network approaches for Indian Sign Language recognition. Neural Computing and Applications, 33(12), 6685–6696.
+Singla et al. (2024). Enhancing Indian sign language recognition through data augmentation and visual transformer. Neural Computing and Applications, 36(24).
+Nedungadi et al. (2025). Vision transformer-powered conversational agent for real-time ISL e-governance accessibility. Scientific Reports, 15.
+Natarajan et al. (2022). Development of an end-to-end deep learning framework for sign language recognition, translation, and video generation. IEEE Access, 10.
+Government of India. (2020). National Education Policy 2020. Ministry of Education.
+Government of India. (2023). Digital Personal Data Protection Act 2023.
+22.4 Technology Stack Summary
+Category
+Technology
+Version / Notes
+Frontend
+React.js + TypeScript
+v18+; Create React App / Vite
+Styling
+Tailwind CSS
+v3; utility-first CSS
+3D Avatar
+CWASA / Three.js
+WebGL; browser-native
+Gesture Capture
+MediaPipe Holistic
+v0.5+; 75 landmarks
+Backend
+Flask (Python)
+v3.0; Gunicorn WSGI
+ML Framework
+PyTorch
+v2.0+; CUDA 12
+NLP
+spaCy + Stanford CoreNLP
+v3.7; Java 11+ for CoreNLP
+ASR
+OpenAI Whisper
+v3 large; CUDA optional
+Database
+PostgreSQL + SQLite
+v16; SQLite as fallback
+Cache
+Redis
+v7; via redis-py
+Task Queue
+Celery
+v5.3; Redis broker
+Container
+Docker + Kubernetes
+Docker 25; K8s 1.29
+ML Tracking
+MLflow
+v2.10
+Monitoring
+Prometheus + Grafana
+Standard stack
+CI/CD
+GitHub Actions
+YAML workflows
+Cloud
+AWS EKS / Azure AKS
+Multi-cloud compatible
+— END OF DOCUMENT —
+SignForge PRD v1.0  |  March 2026  |  For Internal Use

@@ -1,0 +1,32 @@
+# Development overrides — automatically loaded by docker compose
+services:
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    command: ["python", "wsgi.py"]
+    environment:
+      FLASK_ENV: development
+      FLASK_DEBUG: "1"
+      LOG_LEVEL: debug
+      SECRET_KEY: dev-secret-change-me
+      JWT_SECRET_KEY: dev-jwt-secret-change-me
+    volumes:
+      - ./apps/api:/app
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    command: ["sh", "-c", "corepack enable && pnpm dev --host 0.0.0.0"]
+    ports:
+      - "3000:3000"
+    environment:
+      VITE_API_URL: http://localhost:5000
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+
+  meilisearch:
+    environment:
+      MEILI_ENV: development

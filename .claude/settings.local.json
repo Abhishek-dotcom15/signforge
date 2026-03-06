@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(echo exit: $?:*)",
+      "Bash(rm:*)",
+      "Bash(node:*)",
+      "Bash(npm install:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm:*)",
+      "Bash(pip install:*)",
+      "Bash(wc:*)",
+      "Bash(grep:*)",
+      "Bash(python3:*)",
+      "Bash(FLASK_APP=wsgi.py python:*)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}
