@@ -19,8 +19,12 @@ import toast from "react-hot-toast";
 export function DeveloperPage() {
   const queryClient = useQueryClient();
   const [showCreateKey, setShowCreateKey] = useState(false);
+  const [showCreateWebhook, setShowCreateWebhook] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
+  const [newWebhookUrl, setNewWebhookUrl] = useState("");
+  const [newWebhookEvents, setNewWebhookEvents] = useState<string[]>(["translation.completed"]);
   const [createdKey, setCreatedKey] = useState<string | null>(null);
+  const [createdWebhookSecret, setCreatedWebhookSecret] = useState<string | null>(null);
 
   const { data: keys, isLoading: keysLoading, error: keysError, refetch: refetchKeys } = useQuery({
     queryKey: ["api-keys"],
@@ -54,6 +58,16 @@ export function DeveloperPage() {
       queryClient.invalidateQueries({ queryKey: ["api-keys"] });
       toast.success("API key revoked.");
     },
+  });
+
+  const createWebhook = useMutation({
+    mutationFn: () => developerApi.createWebhook({ url: newWebhookUrl, events: newWebhookEvents }),
+    onSuccess: (data) => {
+      setCreatedWebhookSecret(data.secret);
+      queryClient.invalidateQueries({ queryKey: ["webhooks"] });
+      toast.success("Webhook created!");
+    },
+    onError: (e) => toast.error(getErrorMessage(e)),
   });
 
   const copyKey = (key: string) => {
@@ -156,9 +170,72 @@ export function DeveloperPage() {
             <CardDescription className="mt-1">
               {usage ? `${usage.totalRequests} total requests with ${usage.avgResponseMs}ms average response time.` : "Loading usage data..."}
             </CardDescription>
-            <div className="mt-8 flex h-48 items-center justify-center rounded-lg bg-[var(--bg-tertiary)]">
-              <p className="text-sm text-[var(--text-muted)]">Usage chart will render here</p>
-            </div>
+
+            {usage?.daily?.length ? (() => {
+              const maxRequests = Math.max(...usage.daily.map((d) => d.requests), 1);
+              return (
+                <div className="mt-6 space-y-4">
+                  {/* Bar chart */}
+                  <div className="flex items-end gap-1" style={{ height: "12rem" }}>
+                    {usage.daily.map((d) => {
+                      const heightPct = (d.requests / maxRequests) * 100;
+                      return (
+                        <div
+                          key={d.date}
+                          className="group relative flex-1 flex flex-col items-center justify-end"
+                          style={{ height: "100%" }}
+                        >
+                          {/* Tooltip */}
+                          <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded bg-[var(--bg-primary)] border border-[var(--border)] px-2 py-1 text-xs shadow-lg z-10">
+                            <span className="font-medium text-[var(--text-primary)]">{d.requests} req</span>
+                            <span className="text-[var(--text-muted)]"> · {d.avgMs}ms avg</span>
+                            <div className="text-[var(--text-muted)]">{new Date(d.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</div>
+                          </div>
+                          {/* Bar */}
+                          <div
+                            className="w-full min-w-[4px] rounded-t bg-blue-500 transition-all hover:bg-blue-400"
+                            style={{ height: `${Math.max(heightPct, 2)}%` }}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* X-axis labels (show first, middle, last) */}
+                  <div className="flex justify-between text-xs text-[var(--text-muted)]">
+                    {[usage.daily[0], usage.daily[Math.floor(usage.daily.length / 2)], usage.daily[usage.daily.length - 1]]
+                      .filter((d): d is NonNullable<typeof d> => d != null)
+                      .map((d) => (
+                        <span key={d.date}>{new Date(d.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
+                      ))}
+                  </div>
+
+                  {/* Summary table */}
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Date</TableHead>
+                        <TableHead className="text-right">Requests</TableHead>
+                        <TableHead className="text-right">Avg Response</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {[...usage.daily].reverse().map((d) => (
+                        <TableRow key={d.date}>
+                          <TableCell className="text-sm">{new Date(d.date).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</TableCell>
+                          <TableCell className="text-right font-mono text-sm">{d.requests.toLocaleString()}</TableCell>
+                          <TableCell className="text-right font-mono text-sm">{d.avgMs}ms</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              );
+            })() : (
+              <div className="mt-8 flex h-48 items-center justify-center rounded-lg bg-[var(--bg-tertiary)]">
+                <p className="text-sm text-[var(--text-muted)]">No usage data for this period.</p>
+              </div>
+            )}
           </Card>
         </TabContent>
 
@@ -169,10 +246,18 @@ export function DeveloperPage() {
               icon={<Webhook className="h-8 w-8" />}
               title="No webhooks configured"
               description="Set up webhooks to receive real-time notifications when events occur."
-              action={{ label: "Add webhook", onClick: () => {} }}
+              action={{ label: "Add webhook", onClick: () => setShowCreateWebhook(true) }}
             />
           ) : (
             <div className="space-y-3">
+              <div className="mb-4 flex items-center justify-between">
+                <p className="text-sm text-[var(--text-secondary)]">
+                  Receive real-time notifications when events occur.
+                </p>
+                <Button size="sm" icon={<Plus className="h-4 w-4" />} onClick={() => setShowCreateWebhook(true)}>
+                  Add webhook
+                </Button>
+              </div>
               {webhooks.map((wh) => (
                 <Card key={wh.id} padding="md">
                   <div className="flex items-center justify-between">
@@ -190,6 +275,81 @@ export function DeveloperPage() {
           )}
         </TabContent>
       </Tabs>
+
+      {/* Create Webhook Modal */}
+      <Modal
+        open={showCreateWebhook}
+        onOpenChange={(open) => {
+          setShowCreateWebhook(open);
+          if (!open) {
+            setNewWebhookUrl("");
+            setNewWebhookEvents(["translation.completed"]);
+            setCreatedWebhookSecret(null);
+          }
+        }}
+        title="Add Webhook"
+        size="sm"
+      >
+        {createdWebhookSecret ? (
+          <div className="space-y-4">
+            <p className="text-sm text-[var(--text-secondary)]">
+              Copy this signing secret now. You won't be able to see it again.
+            </p>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 rounded-lg border bg-[var(--bg-secondary)] px-3 py-2 text-sm font-mono break-all">
+                {createdWebhookSecret}
+              </code>
+              <Button variant="secondary" size="icon" onClick={() => copyKey(createdWebhookSecret)}>
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
+            <Button className="w-full" onClick={() => { setCreatedWebhookSecret(null); setShowCreateWebhook(false); setNewWebhookUrl(""); setNewWebhookEvents(["translation.completed"]); }}>
+              Done
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <Input
+              label="Payload URL"
+              value={newWebhookUrl}
+              onChange={(e) => setNewWebhookUrl(e.target.value)}
+              placeholder="https://example.com/webhook"
+            />
+            <div>
+              <label className="mb-2 block text-sm font-medium text-[var(--text-primary)]">Events</label>
+              <div className="space-y-2">
+                {["translation.completed", "sign.created", "sign.updated"].map((event) => (
+                  <label key={event} className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                    <input
+                      type="checkbox"
+                      checked={newWebhookEvents.includes(event)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setNewWebhookEvents((prev) => [...prev, event]);
+                        } else {
+                          setNewWebhookEvents((prev) => prev.filter((ev) => ev !== event));
+                        }
+                      }}
+                      className="rounded border-[var(--border)]"
+                    />
+                    <code className="text-xs">{event}</code>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <Button variant="ghost" onClick={() => setShowCreateWebhook(false)}>Cancel</Button>
+              <Button
+                onClick={() => createWebhook.mutate()}
+                loading={createWebhook.isPending}
+                disabled={!newWebhookUrl.trim() || newWebhookEvents.length === 0}
+              >
+                Create
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* Create Key Modal */}
       <Modal open={showCreateKey} onOpenChange={setShowCreateKey} title="Create API Key" size="sm">

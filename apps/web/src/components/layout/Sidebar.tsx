@@ -1,4 +1,6 @@
+import { useCallback } from "react";
 import { NavLink } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   MessageSquare,
   Book,
@@ -13,6 +15,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useAuthStore } from "@/stores/auth-store";
+import { dashboardApi } from "@/features/dashboard/api/dashboard-api";
+import { signsApi } from "@/features/communication/api/translate-api";
+import { storiesApi } from "@/features/stories/api/stories-api";
 import type { UserRole } from "@/types";
 
 interface SidebarProps {
@@ -59,12 +64,34 @@ const navItems: NavItem[] = [
   },
 ];
 
+/** Map of nav paths to prefetch functions */
+const prefetchMap: Record<string, (qc: ReturnType<typeof useQueryClient>) => void> = {
+  "/dashboard": (qc) => {
+    qc.prefetchQuery({ queryKey: ["dashboard-stats"], queryFn: () => dashboardApi.getStats(), staleTime: 1000 * 60 * 5 });
+  },
+  "/dictionary": (qc) => {
+    qc.prefetchQuery({ queryKey: ["signs", "", 1], queryFn: () => signsApi.list({ page: 1, perPage: 20 }), staleTime: 1000 * 60 * 5 });
+  },
+  "/stories": (qc) => {
+    qc.prefetchQuery({ queryKey: ["stories", undefined, undefined], queryFn: () => storiesApi.list({ perPage: 20 }), staleTime: 1000 * 60 * 5 });
+  },
+};
+
 export function Sidebar({ open, onClose }: SidebarProps) {
   const { user } = useAuthStore();
   const userRoles = user?.roles || [];
+  const queryClient = useQueryClient();
 
   const visibleItems = navItems.filter(
     (item) => !item.roles || item.roles.some((r) => userRoles.includes(r))
+  );
+
+  const handlePrefetch = useCallback(
+    (path: string) => {
+      const prefetch = prefetchMap[path];
+      if (prefetch) prefetch(queryClient);
+    },
+    [queryClient],
   );
 
   return (
@@ -92,6 +119,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               key={item.path}
               to={item.path}
               onClick={onClose}
+              onMouseEnter={() => handlePrefetch(item.path)}
               className={({ isActive }) =>
                 cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",

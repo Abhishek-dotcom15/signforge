@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { BookOpen, Clock, Eye, Filter } from "lucide-react";
 import { Card, CardTitle, CardDescription } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";
@@ -98,36 +99,38 @@ export function StoriesPage() {
         <>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {data.data.map((story) => (
-              <Card key={story.id} hoverable padding="sm" className="overflow-hidden">
-                <div className="relative h-40 rounded-lg bg-[var(--bg-tertiary)] flex items-center justify-center">
-                  {story.thumbnailUrl ? (
-                    <img src={story.thumbnailUrl} alt={story.titleEn} className="h-full w-full object-cover rounded-lg" />
-                  ) : (
-                    <div className={`flex h-14 w-14 items-center justify-center rounded-xl text-white ${themeColors[story.theme] || "bg-gray-500"}`}>
-                      <BookOpen className="h-7 w-7" />
-                    </div>
-                  )}
-                  <Badge className="absolute top-2 right-2" color={
-                    story.difficulty === "beginner" ? "green" : story.difficulty === "intermediate" ? "amber" : "red"
-                  }>
-                    {story.difficulty}
-                  </Badge>
-                </div>
-                <div className="mt-3 px-1">
-                  <CardTitle className="!text-base line-clamp-1">{story.titleEn}</CardTitle>
-                  {story.titleHi && (
-                    <p className="text-sm font-hindi text-[var(--text-muted)]">{story.titleHi}</p>
-                  )}
-                  {story.summaryEn && (
-                    <CardDescription className="mt-1 line-clamp-2">{story.summaryEn}</CardDescription>
-                  )}
-                  <div className="mt-3 flex items-center gap-4 text-xs text-[var(--text-muted)]">
-                    <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {story.durationMin || "?"} min</span>
-                    <span className="flex items-center gap-1"><BookOpen className="h-3.5 w-3.5" /> {story.chapterCount} ch.</span>
-                    <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" /> {story.viewCount}</span>
+              <Link key={story.id} to={`/stories/${story.id}`} className="block">
+                <Card hoverable padding="sm" className="overflow-hidden">
+                  <div className="relative h-40 rounded-lg bg-[var(--bg-tertiary)] flex items-center justify-center">
+                    {story.thumbnailUrl ? (
+                      <img src={story.thumbnailUrl} alt={story.titleEn} className="h-full w-full object-cover rounded-lg" />
+                    ) : (
+                      <div className={`flex h-14 w-14 items-center justify-center rounded-xl text-white ${themeColors[story.theme] || "bg-gray-500"}`}>
+                        <BookOpen className="h-7 w-7" />
+                      </div>
+                    )}
+                    <Badge className="absolute top-2 right-2" color={
+                      story.difficulty === "beginner" ? "green" : story.difficulty === "intermediate" ? "amber" : "red"
+                    }>
+                      {story.difficulty}
+                    </Badge>
                   </div>
-                </div>
-              </Card>
+                  <div className="mt-3 px-1">
+                    <CardTitle className="!text-base line-clamp-1">{story.titleEn}</CardTitle>
+                    {story.titleHi && (
+                      <p className="text-sm font-hindi text-[var(--text-muted)]">{story.titleHi}</p>
+                    )}
+                    {story.summaryEn && (
+                      <CardDescription className="mt-1 line-clamp-2">{story.summaryEn}</CardDescription>
+                    )}
+                    <div className="mt-3 flex items-center gap-4 text-xs text-[var(--text-muted)]">
+                      <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {story.durationMin || "?"} min</span>
+                      <span className="flex items-center gap-1"><BookOpen className="h-3.5 w-3.5" /> {story.chapterCount} ch.</span>
+                      <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" /> {story.viewCount}</span>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
             ))}
           </div>
           <Pagination page={page} totalPages={data.pages} onPageChange={setPage} className="mt-8" />

@@ -3,9 +3,11 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from marshmallow import Schema, fields, validate, ValidationError
 
-from app.extensions import db
+from app.extensions import db, limiter
 from app.models.user import User
 from app.services.auth_service import create_user, authenticate, generate_tokens
+from app.utils.sanitize import sanitize_string
+from app.utils.responses import success_response, error_response
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -27,38 +29,40 @@ login_schema = LoginSchema()
 
 
 @auth_bp.route("/register", methods=["POST"])
+@limiter.limit("5 per minute")
 def register():
     try:
         data = register_schema.load(request.get_json())
     except ValidationError as e:
-        return jsonify({"error": "Validation failed", "details": e.messages}), 400
+        return error_response("Validation failed", 400, errors=e.messages)
 
     if User.query.filter_by(email=data["email"].lower()).first():
-        return jsonify({"error": "Email already registered"}), 409
+        return error_response("Email already registered", 409)
 
     user = create_user(
         email=data["email"],
         password=data["password"],
-        full_name=data["fullName"],
+        full_name=sanitize_string(data["fullName"]),
         is_deaf=data.get("isDeaf", False),
     )
     tokens = generate_tokens(user)
-    return jsonify({"user": user.to_dict(), **tokens}), 201
+    return success_response({"user": user.to_dict(), **tokens}, status=201)
 
 
 @auth_bp.route("/login", methods=["POST"])
+@limiter.limit("5 per minute")
 def login():
     try:
         data = login_schema.load(request.get_json())
     except ValidationError as e:
-        return jsonify({"error": "Validation failed", "details": e.messages}), 400
+        return error_response("Validation failed", 400, errors=e.messages)
 
     user = authenticate(data["email"], data["password"])
     if not user:
-        return jsonify({"error": "Invalid email or password"}), 401
+        return error_response("Invalid email or password", 401)
 
     tokens = generate_tokens(user)
-    return jsonify({"user": user.to_dict(), **tokens})
+    return success_response({"user": user.to_dict(), **tokens})
 
 
 @auth_bp.route("/refresh", methods=["POST"])

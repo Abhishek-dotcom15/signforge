@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { User, Palette, Bell, Shield, Globe } from "lucide-react";
+import { User, Palette, Bell, Shield, Globe, Monitor, Clock } from "lucide-react";
 import { Card, CardTitle, CardDescription } from "@/components/common/Card";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
@@ -8,6 +8,7 @@ import { Switch } from "@/components/common/Switch";
 import { Tabs, TabContent } from "@/components/common/Tabs";
 import { Avatar } from "@/components/common/Avatar";
 import { Alert } from "@/components/common/Alert";
+import { Modal } from "@/components/common/Modal";
 import { useAuthStore } from "@/stores/auth-store";
 import { useThemeStore } from "@/stores/theme-store";
 import { userApi } from "@/features/user/api/user-api";
@@ -46,6 +47,26 @@ export function SettingsPage() {
     },
     onError: (e) => toast.error(getErrorMessage(e)),
   });
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  const sessionInfo = useMemo(() => {
+    const ua = navigator.userAgent;
+    let browser = "Unknown browser";
+    if (ua.includes("Firefox")) browser = "Firefox";
+    else if (ua.includes("Edg/")) browser = "Microsoft Edge";
+    else if (ua.includes("Chrome")) browser = "Chrome";
+    else if (ua.includes("Safari")) browser = "Safari";
+
+    let os = "Unknown OS";
+    if (ua.includes("Windows")) os = "Windows";
+    else if (ua.includes("Mac OS")) os = "macOS";
+    else if (ua.includes("Linux")) os = "Linux";
+    else if (ua.includes("Android")) os = "Android";
+    else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
+
+    return { browser, os };
+  }, []);
 
   const handlePasswordSubmit = () => {
     if (newPassword.length < 8) {
@@ -201,19 +222,67 @@ export function SettingsPage() {
             <Card padding="lg">
               <CardTitle>Active Sessions</CardTitle>
               <CardDescription>Manage devices where you're logged in</CardDescription>
-              <div className="mt-4">
-                <Alert variant="info">
-                  Session management will be available in a future update.
-                </Alert>
+              <div className="mt-4 space-y-3">
+                <div className="flex items-start gap-3 rounded-lg border border-[var(--border-default)] p-4">
+                  <Monitor className="mt-0.5 h-5 w-5 text-[var(--text-muted)]" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[var(--text-primary)]">
+                      {sessionInfo.browser} on {sessionInfo.os}
+                    </p>
+                    <div className="mt-1 flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
+                      <Clock className="h-3.5 w-3.5" />
+                      <span>
+                        Logged in since{" "}
+                        {user?.createdAt
+                          ? new Date(user.createdAt).toLocaleDateString(undefined, {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })
+                          : "unknown"}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                    Current
+                  </span>
+                </div>
               </div>
             </Card>
             <Card padding="lg" className="border-red-200 dark:border-red-800">
               <CardTitle className="!text-red-600 dark:!text-red-400">Danger Zone</CardTitle>
               <CardDescription>Irreversible account actions</CardDescription>
               <div className="mt-4">
-                <Button variant="danger" size="sm">Delete account</Button>
+                <Button variant="danger" size="sm" onClick={() => setDeleteModalOpen(true)}>
+                  Delete account
+                </Button>
               </div>
             </Card>
+
+            <Modal
+              open={deleteModalOpen}
+              onOpenChange={setDeleteModalOpen}
+              title="Delete Account"
+              description="This action is permanent and cannot be undone."
+              size="sm"
+            >
+              <Alert variant="warning" title="Account deletion requires support">
+                Please contact support at{" "}
+                <a
+                  href="mailto:support@signforge.dev"
+                  className="font-semibold underline"
+                >
+                  support@signforge.dev
+                </a>{" "}
+                to delete your account. Our team will verify your identity and
+                process the request within 48 hours.
+              </Alert>
+              <div className="mt-6 flex justify-end">
+                <Button variant="secondary" onClick={() => setDeleteModalOpen(false)}>
+                  Close
+                </Button>
+              </div>
+            </Modal>
           </div>
         </TabContent>
 

@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.extensions import db
 from app.models.story import Story, StoryChapter, UserStoryProgress, StoryQuiz, QuizAttempt
+from app.utils.responses import paginated_response, error_response
 
 stories_bp = Blueprint("stories", __name__)
 
@@ -20,19 +21,19 @@ def list_stories():
         query = query.filter_by(difficulty=difficulty)
 
     pagination = query.order_by(Story.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
-    return jsonify({
-        "data": [s.to_dict() for s in pagination.items],
-        "total": pagination.total,
-        "page": pagination.page,
-        "pages": pagination.pages,
-    })
+    return paginated_response(
+        items=[s.to_dict() for s in pagination.items],
+        total=pagination.total,
+        page=pagination.page,
+        per_page=per_page,
+    )
 
 
 @stories_bp.route("/<story_id>", methods=["GET"])
 def get_story(story_id):
     story = db.session.get(Story, story_id)
     if not story or not story.is_published:
-        return jsonify({"error": "Story not found"}), 404
+        return error_response("Story not found", 404)
     story.view_count += 1
     db.session.commit()
     result = story.to_dict()
@@ -47,7 +48,7 @@ def get_story(story_id):
 def get_chapter(story_id, chapter_num):
     chapter = StoryChapter.query.filter_by(story_id=story_id, chapter_num=chapter_num).first()
     if not chapter:
-        return jsonify({"error": "Chapter not found"}), 404
+        return error_response("Chapter not found", 404)
     return jsonify({
         "chapterNum": chapter.chapter_num,
         "titleEn": chapter.title_en,

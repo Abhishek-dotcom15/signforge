@@ -1,11 +1,25 @@
 import { apiClient } from "@/lib/api-client";
 
+export interface ServiceHealth {
+  name: string;
+  status: "healthy" | "unhealthy" | "unknown";
+}
+
+export interface ActivityItem {
+  type: "user_registered" | "story_created";
+  description: string;
+  timestamp: string | null;
+  meta: Record<string, string>;
+}
+
 export interface AdminStats {
   totalUsers: number;
   activeUsers: number;
   totalSigns: number;
   totalStories: number;
   totalSigmlFiles: number;
+  services: ServiceHealth[];
+  recentActivity: ActivityItem[];
 }
 
 export interface AdminUser {

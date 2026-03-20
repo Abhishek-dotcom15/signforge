@@ -12,6 +12,7 @@ const DashboardPage = lazy(() => import("@/features/auth/components/DashboardPag
 const TranslatePage = lazy(() => import("@/features/communication/components/TranslatePage").then((m) => ({ default: m.TranslatePage })));
 const DictionaryPage = lazy(() => import("@/features/dictionary/DictionaryPage").then((m) => ({ default: m.DictionaryPage })));
 const StoriesPage = lazy(() => import("@/features/stories/StoriesPage").then((m) => ({ default: m.StoriesPage })));
+const StoryReaderPage = lazy(() => import("@/features/stories/StoryReaderPage").then((m) => ({ default: m.StoryReaderPage })));
 const LearnPage = lazy(() => import("@/features/learn/LearnPage").then((m) => ({ default: m.LearnPage })));
 const DeveloperPage = lazy(() => import("@/features/developer/DeveloperPage").then((m) => ({ default: m.DeveloperPage })));
 const ClassroomPage = lazy(() => import("@/features/education/ClassroomPage").then((m) => ({ default: m.ClassroomPage })));
@@ -61,6 +62,7 @@ const router = createBrowserRouter([
       { path: "/translate", element: <SuspensePage><TranslatePage /></SuspensePage> },
       { path: "/dictionary", element: <SuspensePage><DictionaryPage /></SuspensePage> },
       { path: "/stories", element: <SuspensePage><StoriesPage /></SuspensePage> },
+      { path: "/stories/:id", element: <SuspensePage><StoryReaderPage /></SuspensePage> },
       { path: "/learn", element: <SuspensePage><LearnPage /></SuspensePage> },
       { path: "/developer", element: <SuspensePage><DeveloperPage /></SuspensePage> },
       { path: "/classroom", element: <SuspensePage><ClassroomPage /></SuspensePage> },

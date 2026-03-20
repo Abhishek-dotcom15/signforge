@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/common/Button";
 import { Card, CardTitle } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";
+import { ISLAvatar } from "@/components/avatar/ISLAvatar";
 import { useTranslation } from "../hooks/useTranslation";
 import { Languages, Play, Pause, RotateCcw, Maximize2, Volume2 } from "lucide-react";
 import type { TranslationResponse } from "@/types";
@@ -19,7 +20,12 @@ export function TranslatePage() {
     if (!text.trim()) return;
     translation.mutate(
       { text, sourceLang, speed },
-      { onSuccess: (data) => setResult(data) }
+      {
+        onSuccess: (data) => {
+          setResult(data);
+          setIsPlaying(true); // Auto-play after translation
+        },
+      }
     );
   };
 
@@ -94,22 +100,17 @@ export function TranslatePage() {
           </div>
 
           {/* Avatar viewport */}
-          <div className="mt-3 flex aspect-video items-center justify-center rounded-lg bg-[var(--bg-tertiary)]">
-            {result ? (
-              <div className="text-center">
-                <div className="mb-4 text-6xl">🧏</div>
-                <p className="text-sm text-[var(--text-secondary)]">
-                  Avatar renders here (CWASA WebGL)
-                </p>
-                <p className="mt-1 text-xs text-[var(--text-muted)]">
-                  Glosses: {result.glosses.join(" ")}
-                </p>
-              </div>
-            ) : (
-              <p className="text-sm text-[var(--text-muted)]">
-                Translate text to see the ISL avatar
-              </p>
-            )}
+          <div className="mt-3 flex aspect-video items-center justify-center rounded-lg bg-[var(--bg-tertiary)] overflow-hidden p-4">
+            <ISLAvatar
+              glosses={result?.glosses ?? []}
+              isPlaying={isPlaying}
+              speed={speed}
+              onGlossChange={(_idx) => {
+                // could highlight word mapping in future
+              }}
+              onComplete={() => setIsPlaying(false)}
+              className="h-full w-full"
+            />
           </div>
 
           {/* Playback controls */}
@@ -124,7 +125,12 @@ export function TranslatePage() {
                 >
                   {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
                 </Button>
-                <Button variant="ghost" size="icon" aria-label="Rewind">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Rewind"
+                  onClick={() => { setIsPlaying(false); setTimeout(() => setIsPlaying(true), 50); }}
+                >
                   <RotateCcw className="h-4 w-4" />
                 </Button>
                 <Button variant="ghost" size="icon" aria-label="Fullscreen">

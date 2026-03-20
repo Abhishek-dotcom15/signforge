@@ -1,8 +1,12 @@
+import uuid as _uuid
+from datetime import datetime, timedelta, timezone
+
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from sqlalchemy import func
+from sqlalchemy import func, select, distinct
 from app.extensions import db
 from app.models.story import UserStoryProgress
+from app.models.developer import ApiUsageLog
 
 learn_bp = Blueprint("learn", __name__)
 
@@ -28,26 +32,62 @@ def list_modules():
     return jsonify([{**m, "lessonsCompleted": 0} for m in MODULES])
 
 
+def _compute_streak(user_id):
+    """Compute consecutive-day streak from UserStoryProgress completion dates."""
+    rows = db.session.execute(
+        select(func.distinct(func.date(UserStoryProgress.completed_at)))
+        .where(
+            UserStoryProgress.user_id == user_id,
+            UserStoryProgress.completed_at.isnot(None),
+        )
+        .order_by(func.date(UserStoryProgress.completed_at).desc())
+    ).scalars().all()
+
+    if not rows:
+        return 0
+
+    today = datetime.now(timezone.utc).date()
+    streak = 0
+    for d in rows:
+        expected = today - timedelta(days=streak)
+        if d == expected:
+            streak += 1
+        elif streak == 0 and d == today - timedelta(days=1):
+            # Allow streak to start from yesterday
+            streak = 1
+        else:
+            break
+    return streak
+
+
 @learn_bp.route("/stats", methods=["GET"])
 @jwt_required()
 def learning_stats():
-    user_id = get_jwt_identity()
+    user_id = _uuid.UUID(get_jwt_identity())
 
     completed_stories = (
-        db.session.query(func.count(UserStoryProgress.id))
-        .filter(UserStoryProgress.user_id == user_id, UserStoryProgress.status == "completed")
-        .scalar()
+        db.session.execute(
+            select(func.count(UserStoryProgress.id))
+            .where(UserStoryProgress.user_id == user_id, UserStoryProgress.status == "completed")
+        ).scalar()
     ) or 0
 
-    total_time = (
-        db.session.query(func.sum(UserStoryProgress.time_spent_sec))
-        .filter(UserStoryProgress.user_id == user_id)
-        .scalar()
+    # Count unique signs the user has interacted with via API
+    signs_learned = (
+        db.session.execute(
+            select(func.count(distinct(ApiUsageLog.endpoint)))
+            .where(
+                ApiUsageLog.user_id == user_id,
+                ApiUsageLog.endpoint.like("%/signs/%"),
+            )
+        ).scalar()
     ) or 0
+
+    streak_days = _compute_streak(user_id)
 
     return jsonify({
         "totalLessons": sum(m["lessonsTotal"] for m in MODULES),
-        "completedLessons": 0,  # MVP placeholder
-        "streakDays": 0,  # MVP placeholder
-        "signsLearned": completed_stories * 5,  # rough estimate
+        "completedLessons": completed_stories,
+        "streakDays": streak_days,
+        "signsLearned": signs_learned,
     })

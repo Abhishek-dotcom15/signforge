@@ -10,9 +10,9 @@ export async function initMonitoring() {
   if (!dsn) return;
 
   try {
-    // Dynamic import — @sentry/react is an optional peer dependency.
-    // @ts-expect-error -- @sentry/react may not be installed
-    const Sentry = await import("@sentry/react");
+    // Use a variable so Vite's static import analysis can't resolve the specifier.
+    const pkg = "@sentry/react";
+    const Sentry = await import(/* @vite-ignore */ pkg);
     if (!Sentry?.init) return;
 
     Sentry.init({

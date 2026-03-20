@@ -55,6 +55,8 @@ class Sign(db.Model):
             "difficulty": self.difficulty,
             "examples": [{"sentenceEn": e.sentence_en, "islGloss": e.isl_gloss} for e in self.examples],
             "handshapeDesc": self.handshape_desc,
+            "usageCount": self.usage_count or 0,
+            "isActive": self.is_active,
         }
 
 

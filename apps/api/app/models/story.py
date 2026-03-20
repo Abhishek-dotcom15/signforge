@@ -26,6 +26,10 @@ class Story(db.Model):
     chapters = db.relationship("StoryChapter", backref="story", cascade="all, delete-orphan", order_by="StoryChapter.chapter_num")
     quizzes = db.relationship("StoryQuiz", backref="story", cascade="all, delete-orphan")
 
+    __table_args__ = (
+        db.Index("ix_stories_published_created", "is_published", "created_at"),
+    )
+
     def to_dict(self):
         return {
             "id": str(self.id), "titleEn": self.title_en, "titleHi": self.title_hi,
@@ -33,6 +37,7 @@ class Story(db.Model):
             "difficulty": self.difficulty, "durationMin": self.duration_min,
             "wordCount": self.word_count, "chapterCount": self.chapter_count,
             "thumbnailUrl": self.thumbnail_url, "viewCount": self.view_count,
+            "isPublished": self.is_published,
         }
 
 
@@ -85,7 +90,11 @@ class UserStoryProgress(db.Model):
     completion_pct = db.Column(db.Numeric(5, 2), default=0)
     time_spent_sec = db.Column(db.Integer, default=0)
     completed_at = db.Column(db.DateTime(timezone=True))
-    __table_args__ = (db.UniqueConstraint("user_id", "story_id"),)
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "story_id"),
+        db.Index("ix_user_story_progress_user_status", "user_id", "status"),
+        db.Index("ix_user_story_progress_completed_at", "completed_at"),
+    )
 
 
 class QuizAttempt(db.Model):

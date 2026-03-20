@@ -1,10 +1,32 @@
 import hashlib
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.extensions import db
+from marshmallow import Schema, fields, validate, ValidationError
+
+from app.extensions import db, limiter
 from app.models.developer import ApiKey, Webhook, ApiUsageLog, Subscription
 
 developer_bp = Blueprint("developer", __name__)
+
+
+class CreateApiKeySchema(Schema):
+    name = fields.Str(load_default="Default", validate=validate.Length(min=1, max=255))
+    scopes = fields.List(
+        fields.Str(validate=validate.OneOf(["translate:read", "translate:write", "signs:read", "signs:write"])),
+        load_default=["translate:read"],
+    )
+
+
+class CreateWebhookSchema(Schema):
+    url = fields.Url(required=True, schemes={"https"})
+    events = fields.List(
+        fields.Str(validate=validate.OneOf(["translation.completed", "sign.created", "sign.updated"])),
+        load_default=["translation.completed"],
+    )
+
+
+create_api_key_schema = CreateApiKeySchema()
+create_webhook_schema = CreateWebhookSchema()
 
 
 @developer_bp.route("/api-keys", methods=["GET"])
@@ -27,19 +49,23 @@ def list_api_keys():
 
 @developer_bp.route("/api-keys", methods=["POST"])
 @jwt_required()
+@limiter.limit("10 per hour")
 def create_api_key():
     user_id = get_jwt_identity()
-    data = request.get_json()
+    try:
+        data = create_api_key_schema.load(request.get_json() or {})
+    except ValidationError as e:
+        return jsonify({"error": "Validation failed", "details": e.messages}), 400
 
     raw_key, prefix = ApiKey.generate_key()
     key_hash = hashlib.sha256(raw_key.encode()).hexdigest()
 
     api_key = ApiKey(
         user_id=user_id,
-        name=data.get("name", "Default"),
+        name=data["name"],
         key_hash=key_hash,
         prefix=prefix,
-        scopes=data.get("scopes", ["translate:read"]),
+        scopes=data["scopes"],
     )
     db.session.add(api_key)
     db.session.commit()
@@ -84,14 +110,18 @@ def list_webhooks():
 @jwt_required()
 def create_webhook():
     user_id = get_jwt_identity()
-    data = request.get_json()
+    try:
+        data = create_webhook_schema.load(request.get_json() or {})
+    except ValidationError as e:
+        return jsonify({"error": "Validation failed", "details": e.messages}), 400
+
     import secrets
 
     webhook = Webhook(
         user_id=user_id,
         url=data["url"],
         secret=secrets.token_hex(32),
-        events=data.get("events", ["translation.completed"]),
+        events=data["events"],
     )
     db.session.add(webhook)
     db.session.commit()
@@ -102,7 +132,7 @@ def create_webhook():
 @jwt_required()
 def usage_stats():
     user_id = get_jwt_identity()
-    from sqlalchemy import func
+    from sqlalchemy import func, cast, Date
     from datetime import datetime, timedelta, timezone
 
     since = datetime.now(timezone.utc) - timedelta(days=30)
@@ -114,8 +144,32 @@ def usage_stats():
         .filter(ApiUsageLog.user_id == user_id, ApiUsageLog.created_at >= since)
         .first()
     )
+
+    # Daily breakdown for the last 30 days
+    daily_rows = (
+        db.session.query(
+            cast(ApiUsageLog.created_at, Date).label("date"),
+            func.count(ApiUsageLog.id).label("requests"),
+            func.avg(ApiUsageLog.response_time_ms).label("avg_ms"),
+        )
+        .filter(ApiUsageLog.user_id == user_id, ApiUsageLog.created_at >= since)
+        .group_by(cast(ApiUsageLog.created_at, Date))
+        .order_by(cast(ApiUsageLog.created_at, Date))
+        .all()
+    )
+
+    daily = [
+        {
+            "date": row.date.isoformat(),
+            "requests": row.requests,
+            "avgMs": round(float(row.avg_ms or 0), 2),
+        }
+        for row in daily_rows
+    ]
+
     return jsonify({
         "totalRequests": stats.total_requests or 0,
         "avgResponseMs": round(float(stats.avg_response_ms or 0), 2),
         "period": "last_30_days",
+        "daily": daily,
     })

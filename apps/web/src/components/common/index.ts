@@ -21,3 +21,4 @@ export { Tooltip, TooltipProvider } from "./Tooltip";
 export { EmptyState } from "./EmptyState";
 export { ErrorState } from "./ErrorState";
 export { ErrorBoundary } from "./ErrorBoundary";
+export { LazyImage } from "./LazyImage";

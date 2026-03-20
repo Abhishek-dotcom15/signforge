@@ -8,10 +8,17 @@ interface CreateKeyResponse {
   message: string;
 }
 
+interface DailyUsage {
+  date: string;
+  requests: number;
+  avgMs: number;
+}
+
 interface UsageResponse {
   totalRequests: number;
   avgResponseMs: number;
   period: string;
+  daily: DailyUsage[];
 }
 
 interface WebhookResponse {

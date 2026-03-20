@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import Schema, fields, validate, ValidationError
 from app.extensions import db
 from app.models.annotation import FeedbackSubmission
+from app.utils.sanitize import sanitize_string
 
 feedback_bp = Blueprint("feedback", __name__)
 
@@ -31,8 +32,8 @@ def submit_feedback():
         user_id=user_id,
         type=data["type"],
         category=data.get("category"),
-        title=data["title"],
-        description=data["description"],
+        title=sanitize_string(data["title"]),
+        description=sanitize_string(data["description"]),
         metadata_=data.get("metadata", {}),
     )
     db.session.add(feedback)

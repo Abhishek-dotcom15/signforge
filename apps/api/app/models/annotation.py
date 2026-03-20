@@ -46,6 +46,10 @@ class FeedbackSubmission(db.Model):
     status = db.Column(db.String(20), default="open")  # open, reviewing, resolved, closed
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
+    __table_args__ = (
+        db.Index("ix_feedback_submissions_user_created", "user_id", "created_at"),
+    )
+
 
 class ModelVersion(db.Model):
     __tablename__ = "model_versions"

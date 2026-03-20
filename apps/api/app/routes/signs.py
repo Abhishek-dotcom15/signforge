@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from app.extensions import db
 from app.models.sign import Sign
+from app.utils.responses import paginated_response, error_response
 
 signs_bp = Blueprint("signs", __name__)
 
@@ -28,19 +29,19 @@ def list_signs():
         )
 
     pagination = query.order_by(Sign.english_word).paginate(page=page, per_page=per_page, error_out=False)
-    return jsonify({
-        "data": [s.to_dict() for s in pagination.items],
-        "total": pagination.total,
-        "page": pagination.page,
-        "pages": pagination.pages,
-    })
+    return paginated_response(
+        items=[s.to_dict() for s in pagination.items],
+        total=pagination.total,
+        page=pagination.page,
+        per_page=per_page,
+    )
 
 
 @signs_bp.route("/<sign_id>", methods=["GET"])
 def get_sign(sign_id):
     sign = db.session.get(Sign, sign_id)
     if not sign or not sign.is_active:
-        return jsonify({"error": "Sign not found"}), 404
+        return error_response("Sign not found", 404)
     sign.usage_count += 1
     db.session.commit()
     return jsonify(sign.to_dict())

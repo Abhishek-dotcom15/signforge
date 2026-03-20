@@ -80,6 +80,10 @@ class WebhookDelivery(db.Model):
     response_body = db.Column(db.Text)
     delivered_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
+    __table_args__ = (
+        db.Index("ix_webhook_deliveries_webhook_delivered", "webhook_id", "delivered_at"),
+    )
+
 
 class ApiUsageLog(db.Model):
     __tablename__ = "api_usage_logs"
@@ -92,3 +96,8 @@ class ApiUsageLog(db.Model):
     response_time_ms = db.Column(db.Integer)
     ip_address = db.Column(db.String(45))
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+
+    __table_args__ = (
+        db.Index("ix_api_usage_logs_user_created", "user_id", "created_at"),
+        db.Index("ix_api_usage_logs_endpoint_created", "endpoint", "created_at"),
+    )

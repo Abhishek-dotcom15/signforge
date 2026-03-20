@@ -20,6 +20,10 @@ class AuditJob(db.Model):
     completed_at = db.Column(db.DateTime(timezone=True))
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
+    __table_args__ = (
+        db.Index("ix_audit_jobs_user_created", "user_id", "created_at"),
+    )
+
     issues = db.relationship("AuditIssue", backref="job", cascade="all, delete-orphan")
 
 

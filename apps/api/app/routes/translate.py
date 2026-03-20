@@ -1,7 +1,9 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from marshmallow import Schema, fields, validate, ValidationError
-import httpx
+
+from app.extensions import limiter
+from app.services.translation_service import translate_text, translate_batch
 
 translate_bp = Blueprint("translate", __name__)
 
@@ -21,49 +23,25 @@ batch_translate_schema = BatchTranslateSchema()
 
 @translate_bp.route("", methods=["POST"])
 @jwt_required()
-def translate_text():
+@limiter.limit("30 per minute")
+def translate_text_route():
     try:
         data = translate_schema.load(request.get_json() or {})
     except ValidationError as e:
         return jsonify({"error": "Validation failed", "details": e.messages}), 400
 
-    service_url = current_app.config["TRANSLATION_SERVICE_URL"]
-    try:
-        resp = httpx.post(
-            f"{service_url}/translate",
-            json={"text": data["text"], "source_lang": data["sourceLang"]},
-            timeout=30.0,
-        )
-        resp.raise_for_status()
-        return jsonify(resp.json())
-    except httpx.HTTPStatusError as e:
-        return jsonify({"error": "Translation service error", "detail": str(e)}), 502
-    except httpx.TimeoutException:
-        return jsonify({"error": "Translation service timed out"}), 504
-    except httpx.ConnectError:
-        return jsonify({"error": "Translation service unavailable"}), 503
+    result = translate_text(data["text"], data["sourceLang"])
+    return jsonify(result)
 
 
 @translate_bp.route("/batch", methods=["POST"])
 @jwt_required()
-def translate_batch():
+@limiter.limit("30 per minute")
+def translate_batch_route():
     try:
         data = batch_translate_schema.load(request.get_json() or {})
     except ValidationError as e:
         return jsonify({"error": "Validation failed", "details": e.messages}), 400
 
-    service_url = current_app.config["TRANSLATION_SERVICE_URL"]
-    try:
-        resp = httpx.post(
-            f"{service_url}/translate/batch",
-            json={"sentences": data["sentences"]},
-            timeout=60.0,
-        )
-        resp.raise_for_status()
-        return jsonify(resp.json())
-    except httpx.HTTPStatusError as e:
-        return jsonify({"error": "Translation service error", "detail": str(e)}), 502
-    except httpx.TimeoutException:
-        return jsonify({"error": "Translation service timed out"}), 504
-    except httpx.ConnectError:
-        return jsonify({"error": "Translation service unavailable"}), 503
+    results = translate_batch(data["sentences"])
+    return jsonify({"results": results})

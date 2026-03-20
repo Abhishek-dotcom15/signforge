@@ -1,7 +1,11 @@
 import os
 from datetime import timedelta
+from pathlib import Path
 from dotenv import load_dotenv
 
+# Load .env from repo root first, then local override
+_root_env = Path(__file__).resolve().parent.parent.parent.parent / ".env"
+load_dotenv(_root_env)
 load_dotenv()
 
 
@@ -52,3 +56,4 @@ class TestConfig(Config):
     SQLALCHEMY_ENGINE_OPTIONS = {}
     REDIS_URL = "memory://"
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=300)
+    RATELIMIT_ENABLED = False

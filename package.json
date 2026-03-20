@@ -4,6 +4,10 @@
   "private": true,
   "description": "AI-Powered Indian Sign Language Communication & Developer Platform",
   "scripts": {
+    "start": "concurrently -n api,web -c blue,green \"pnpm run start:api\" \"pnpm run start:web\"",
+    "start:api": "cd apps/api && python wsgi.py",
+    "start:web": "cd apps/web && pnpm dev",
+    "setup": "node scripts/setup-local.mjs",
     "dev": "turbo run dev",
     "build": "turbo run build",
     "test": "turbo run test",
@@ -13,8 +17,9 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
   },
   "devDependencies": {
-    "turbo": "^2.4.0",
+    "concurrently": "^9.2.1",
     "prettier": "^3.5.0",
+    "turbo": "^2.4.0",
     "typescript": "^5.7.0"
   },
   "packageManager": "pnpm@9.15.0",
